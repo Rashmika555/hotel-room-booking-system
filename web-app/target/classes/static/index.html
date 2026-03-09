@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Hotel Booking Dashboard</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
+	<body>
+		<div class="bg-orb orb-left"></div>
+		<div class="bg-orb orb-right"></div>
+
+		<main class="container py-4 py-md-5">
+			<section class="hero-panel mb-4 mb-md-5">
+				<div>
+					<p class="hero-kicker mb-2">
+						Hotel Room Booking Management System
+					</p>
+					<h1 class="hero-title mb-2">Reservation Command Center</h1>
+					<p class="hero-subtitle mb-0">
+						Manage bookings, monitor statuses, and keep front-desk
+						operations smooth.
+					</p>
+				</div>
+				<button
+					class="btn btn-brand mt-3 mt-md-0"
+					data-bs-toggle="modal"
+					data-bs-target="#addBookingModal"
+				>
+					Add Booking
+				</button>
+			</section>
+
+			<section class="row g-3 mb-4 stats-grid">
+				<div class="col-12 col-sm-6 col-xl-3">
+					<div class="stats-card stats-total">
+						<p>Total Bookings</p>
+						<h2 id="statTotal">0</h2>
+					</div>
+				</div>
+				<div class="col-12 col-sm-6 col-xl-3">
+					<div class="stats-card stats-active">
+						<p>Active Bookings</p>
+						<h2 id="statActive">0</h2>
+					</div>
+				</div>
+				<div class="col-12 col-sm-6 col-xl-3">
+					<div class="stats-card stats-checked-out">
+						<p>Checked-Out</p>
+						<h2 id="statCheckedOut">0</h2>
+					</div>
+				</div>
+				<div class="col-12 col-sm-6 col-xl-3">
+					<div class="stats-card stats-cancelled">
+						<p>Cancelled</p>
+						<h2 id="statCancelled">0</h2>
+					</div>
+				</div>
+			</section>
+
+			<section class="panel-card p-3 p-md-4 mb-3">
+				<div class="row g-3 align-items-end">
+					<div class="col-12 col-lg-5">
+						<label for="searchInput" class="form-label mb-1"
+							>Live Search Customer</label
+						>
+						<input
+							id="searchInput"
+							class="form-control"
+							type="text"
+							placeholder="Type customer name..."
+						/>
+					</div>
+					<div class="col-12 col-md-6 col-lg-4">
+						<label for="statusFilter" class="form-label mb-1"
+							>Filter by Status</label
+						>
+						<select id="statusFilter" class="form-select">
+							<option value="All">All Status</option>
+							<option value="Booked">Booked</option>
+							<option value="Checked-In">Checked-In</option>
+							<option value="Checked-Out">Checked-Out</option>
+							<option value="Cancelled">Cancelled</option>
+						</select>
+					</div>
+					<div class="col-12 col-md-6 col-lg-3 d-grid">
+						<button id="refreshBtn" class="btn btn-outline-brand">
+							Refresh Data
+						</button>
+					</div>
+				</div>
+			</section>
+
+			<section class="panel-card p-0 overflow-hidden">
+				<div class="table-responsive">
+					<table class="table table-hover align-middle mb-0">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Customer</th>
+								<th>Room</th>
+								<th>Type</th>
+								<th>Check-In</th>
+								<th>Check-Out</th>
+								<th>Amount</th>
+								<th>Status</th>
+								<th>Created</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody id="bookingTableBody"></tbody>
+					</table>
+				</div>
+				<div id="emptyState" class="empty-state d-none">
+					No booking records found for the selected criteria.
+				</div>
+			</section>
+		</main>
+
+		<div
+			class="modal fade"
+			id="addBookingModal"
+			tabindex="-1"
+			aria-hidden="true"
+		>
+			<div class="modal-dialog modal-lg modal-dialog-centered">
+				<div class="modal-content">
+					<form id="addBookingForm" novalidate>
+						<div class="modal-header">
+							<h5 class="modal-title">Add Booking</h5>
+							<button
+								type="button"
+								class="btn-close"
+								data-bs-dismiss="modal"
+								aria-label="Close"
+							></button>
+						</div>
+						<div class="modal-body">
+							<div class="row g-3">
+								<div class="col-md-6">
+									<label class="form-label"
+										>Customer Name</label
+									>
+									<input
+										name="customerName"
+										class="form-control"
+										required
+									/>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label"
+										>Room Number</label
+									>
+									<input
+										name="roomNumber"
+										type="number"
+										min="1"
+										class="form-control"
+										required
+									/>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Room Type</label>
+									<select
+										name="roomType"
+										class="form-select"
+										required
+									>
+										<option value="Single">Single</option>
+										<option value="Double">Double</option>
+										<option value="Suite">Suite</option>
+									</select>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label"
+										>Booking Amount</label
+									>
+									<input
+										name="bookingAmount"
+										type="number"
+										min="0"
+										step="0.01"
+										class="form-control"
+										required
+									/>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label"
+										>Check-In Date</label
+									>
+									<input
+										name="checkInDate"
+										type="date"
+										class="form-control"
+										required
+									/>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label"
+										>Check-Out Date</label
+									>
+									<input
+										name="checkOutDate"
+										type="date"
+										class="form-control"
+									/>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button
+								type="button"
+								class="btn btn-soft"
+								data-bs-dismiss="modal"
+							>
+								Cancel
+							</button>
+							<button type="submit" class="btn btn-brand">
+								Save Booking
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<div
+			class="modal fade"
+			id="editBookingModal"
+			tabindex="-1"
+			aria-hidden="true"
+		>
+			<div class="modal-dialog modal-lg modal-dialog-centered">
+				<div class="modal-content">
+					<form id="editBookingForm" novalidate>
+						<input type="hidden" name="bookingId" />
+						<div class="modal-header">
+							<h5 class="modal-title">Edit Booking</h5>
+							<button
+								type="button"
+								class="btn-close"
+								data-bs-dismiss="modal"
+								aria-label="Close"
+							></button>
+						</div>
+						<div class="modal-body">
+							<div class="row g-3">
+								<div class="col-md-6">
+									<label class="form-label"
+										>Customer Name</label
+									>
+									<input
+										name="customerName"
+										class="form-control"
+										required
+									/>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label"
+										>Room Number</label
+									>
+									<input
+										name="roomNumber"
+										type="number"
+										min="1"
+										class="form-control"
+										required
+									/>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Room Type</label>
+									<select
+										name="roomType"
+										class="form-select"
+										required
+									>
+										<option value="Single">Single</option>
+										<option value="Double">Double</option>
+										<option value="Suite">Suite</option>
+									</select>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label"
+										>Booking Amount</label
+									>
+									<input
+										name="bookingAmount"
+										type="number"
+										min="0"
+										step="0.01"
+										class="form-control"
+										required
+									/>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label"
+										>Check-In Date</label
+									>
+									<input
+										name="checkInDate"
+										type="date"
+										class="form-control"
+										required
+									/>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label"
+										>Check-Out Date</label
+									>
+									<input
+										name="checkOutDate"
+										type="date"
+										class="form-control"
+									/>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Status</label>
+									<select
+										name="bookingStatus"
+										class="form-select"
+										required
+									>
+										<option value="Booked">Booked</option>
+										<option value="Checked-In">
+											Checked-In
+										</option>
+										<option value="Checked-Out">
+											Checked-Out
+										</option>
+										<option value="Cancelled">
+											Cancelled
+										</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button
+								type="button"
+								class="btn btn-soft"
+								data-bs-dismiss="modal"
+							>
+								Cancel
+							</button>
+							<button type="submit" class="btn btn-brand">
+								Update Booking
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<div id="loadingOverlay" class="loading-overlay d-none">
+			<div class="spinner-border text-light" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+
+		<div class="toast-container position-fixed bottom-0 end-0 p-3">
+			<div
+				id="appToast"
+				class="toast align-items-center border-0"
+				role="alert"
+				aria-live="assertive"
+				aria-atomic="true"
+			>
+				<div class="d-flex">
+					<div id="toastMessage" class="toast-body"></div>
+					<button
+						type="button"
+						class="btn-close btn-close-white me-2 m-auto"
+						data-bs-dismiss="toast"
+						aria-label="Close"
+					></button>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="js/app.js"></script>
+	</body>
+</html>
